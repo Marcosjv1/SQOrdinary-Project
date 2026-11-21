@@ -1,0 +1,4 @@
+{
+  "token": "fake-jwt-token-for-cypress-tests",
+  "username": "marcos_qa"
+}

@@ -1,0 +1,9 @@
+{
+  "_id": "6650a2222222222222222222",
+  "titulo": "Maratón más rápido en silla de ruedas (editado)",
+  "descripcion": "Récord establecido en el maratón de Chicago. Actualizado por QA.",
+  "poseedor": "Marcel Hug",
+  "anio": 2021,
+  "imagenUrl": "https://placehold.co/400x220?text=Maraton",
+  "isOficial": false
+}

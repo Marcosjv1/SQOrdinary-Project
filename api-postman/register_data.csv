@@ -1,0 +1,7 @@
+username,password,expectedStatus,note
+ab,secret1,400,username below minimum length (2 chars)
+abc,secret1,201,username exactly at minimum length (3 chars boundary)
+ddvalid1,short,400,password below minimum length (5 chars)
+ddvalid2,secret1,201,both valid - normal case
+,secret1,400,missing username
+ddvalid3,,400,missing password

@@ -1,0 +1,20 @@
+PASS __tests__/authController.test.js
+PASS __tests__/recordController.test.js
+PASS __tests__/User.model.test.js
+----------------------|---------|----------|---------|---------|---------------------
+File                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s   
+----------------------|---------|----------|---------|---------|---------------------
+All files             |   83.14 |    83.33 |      90 |   84.09 |                     
+ controllers          |   84.21 |    89.28 |     100 |   84.21 |                     
+  authController.js   |    87.5 |       95 |     100 |    87.5 | 40-41,51,68-69      
+  recordController.js |   80.55 |       75 |     100 |   80.55 | 8,18-20,29,46,55,65 
+ models               |   76.92 |        0 |      50 |   83.33 |                     
+  Record.js           |     100 |      100 |     100 |     100 |                     
+  User.js             |      70 |        0 |      50 |   77.77 | 24-25               
+----------------------|---------|----------|---------|---------|---------------------
+
+Test Suites: 3 passed, 3 total
+Tests:       22 passed, 22 total
+Snapshots:   0 total
+Time:        1.084 s
+Ran all test suites.

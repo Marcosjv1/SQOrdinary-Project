@@ -1,0 +1,29 @@
+[
+  {
+    "_id": "6650a1111111111111111111",
+    "titulo": "Pizza más grande del mundo",
+    "descripcion": "Elaborada en Roma con más de 13 toneladas de ingredientes.",
+    "poseedor": "NIPFood",
+    "anio": 2012,
+    "imagenUrl": "https://placehold.co/400x220?text=Pizza",
+    "isOficial": true
+  },
+  {
+    "_id": "6650a2222222222222222222",
+    "titulo": "Maratón más rápido en silla de ruedas",
+    "descripcion": "Récord establecido en el maratón de Chicago.",
+    "poseedor": "Marcel Hug",
+    "anio": 2021,
+    "imagenUrl": "https://placehold.co/400x220?text=Maraton",
+    "isOficial": false
+  },
+  {
+    "_id": "6650a3333333333333333333",
+    "titulo": "Torre de cartas más alta",
+    "descripcion": "Construida sin pegamento ni cinta adhesiva.",
+    "poseedor": "Bryan Berg",
+    "anio": 2019,
+    "imagenUrl": "https://placehold.co/400x220?text=Cartas",
+    "isOficial": false
+  }
+]

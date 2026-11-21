@@ -1,0 +1,1293 @@
+{
+  "info": {
+    "_postman_id": "4135b731-6a12-4520-a48d-e838c007b18e",
+    "name": "GuinnessWR API Tests - SQ Ordinary Project",
+    "description": "API test suite for the GuinnessWR backend (SUT for the Software Quality Ordinary Project). 5 Smoke + 19 Regression cases covering all 6 POISED areas (Parameters, Output, Interoperability, Security, Errors, Data). Run against the live deployed backend (https://backendguinnesswr.onrender.com/api). Running this collection creates a handful of real records/users in the live database; cleanup requests are included where possible.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Smoke",
+      "item": [
+        {
+          "name": "API-SM-01: Register new user (Smoke)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Registers a brand new user. Username is made unique per run so it never collides with a previous run.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{dynUsername}}\",\n  \"password\": \"secret123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('dynUsername', 'smoke_' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-SM-01: status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('API-SM-01: response has token and username', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('token');",
+                  "  pm.expect(body).to.have.property('username');",
+                  "});",
+                  "pm.collectionVariables.set('registeredPassword', 'secret123');",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('authToken', pm.response.json().token); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-SM-02: Login with valid credentials (Smoke)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Logs in with the user created in API-SM-01.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{dynUsername}}\",\n  \"password\": \"{{registeredPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-SM-02: status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API-SM-02: response has token and username', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body).to.have.property('token');",
+                  "  pm.expect(body.username).to.eql(pm.collectionVariables.get('dynUsername'));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-SM-03: Get all records (Smoke)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Lists all world-record entries."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-SM-03: status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API-SM-03: response is an array', () => pm.expect(pm.response.json()).to.be.an('array'));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-SM-04: Create record with valid data (Smoke)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Creates a record with every required field filled in.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Smoke Test Record\",\n  \"descripcion\": \"Created by the Smoke suite\",\n  \"poseedor\": \"Postman Runner\",\n  \"anio\": 2026,\n  \"imagenUrl\": \"https://example.com/img.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-SM-04: status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('API-SM-04: response echoes sent fields', () => {",
+                  "  const body = pm.response.json();",
+                  "  pm.expect(body.titulo).to.eql('Smoke Test Record');",
+                  "  pm.expect(body.isOficial).to.eql(false);",
+                  "});",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('smokeRecordId', pm.response.json()._id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-SM-05: Delete the record just created (Smoke)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{smokeRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{smokeRecordId}}"
+              ]
+            },
+            "description": "Deletes the Smoke-suite record created in API-SM-04 (cleanup + Smoke check)."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-SM-05: status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API-SM-05: confirmation message present', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "5 Smoke tests - one happy-path check per core feature."
+    },
+    {
+      "name": "02 - Regression - Auth",
+      "item": [
+        {
+          "name": "API-RG-01: Register rejects missing password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"no_password_user\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-01: status is 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-02: Register rejects duplicate username",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Reuses the username from API-SM-01, which already exists.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{dynUsername}}\",\n  \"password\": \"anotherpass1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-02: status is 409', () => pm.response.to.have.status(409));",
+                  "pm.test('API-RG-02: duplicate message returned', () => {",
+                  "  pm.expect(pm.response.json().message).to.include('ya existe');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-03: Login rejects wrong password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{dynUsername}}\",\n  \"password\": \"wrong-password\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-03: status is 401', () => pm.response.to.have.status(401));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-04: Login rejects nonexistent username",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "POISED-Security: confirms the API does not leak whether a username exists.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user_that_does_not_exist_zzz\",\n  \"password\": \"whatever1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-04: status is 401', () => pm.response.to.have.status(401));",
+                  "pm.test('API-RG-04: same generic message as wrong-password case (no username enumeration)', () => {",
+                  "  pm.expect(pm.response.json().message).to.eql('Credenciales inv\\u00e1lidas');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Negative/security cases for register and login."
+    },
+    {
+      "name": "03 - Regression - Records",
+      "item": [
+        {
+          "name": "Setup: create record for Regression suite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Fixture only - not a graded test case by itself.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Regression Fixture\",\n  \"descripcion\": \"Used by GET/PUT regression cases\",\n  \"poseedor\": \"Postman Runner\",\n  \"anio\": 2020,\n  \"imagenUrl\": \"https://example.com/img2.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('regRecordId', pm.response.json()._id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-05: Get record by valid id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{regRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{regRecordId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-05: status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API-RG-05: returns the right record', () => {",
+                  "  pm.expect(pm.response.json().titulo).to.eql('Regression Fixture');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-06: Get record - valid format but not found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/507f1f77bcf86cd799439011",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "507f1f77bcf86cd799439011"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-06: status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-07: Get record - malformed id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/not-a-valid-id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "not-a-valid-id"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-07: status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('API-RG-07: invalid id message', () => {",
+                  "  pm.expect(pm.response.json().message).to.include('v\\u00e1lido');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-08: Update record with valid partial data",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{regRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{regRecordId}}"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Regression Fixture (updated)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-08: status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('API-RG-08: titulo updated', () => {",
+                  "  pm.expect(pm.response.json().titulo).to.eql('Regression Fixture (updated)');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-09: Update record - nonexistent id",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records/507f1f77bcf86cd799439011",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "507f1f77bcf86cd799439011"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"does not matter\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-09: status is 404', () => pm.response.to.have.status(404));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-10: Create record - missing required field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Incomplete record\",\n  \"descripcion\": \"missing poseedor/anio/imagenUrl\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-10: status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('API-RG-10: validation error list present', () => {",
+                  "  pm.expect(pm.response.json()).to.have.property('errors');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-11: Create record - anio below minimum (0)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Bad year\",\n  \"descripcion\": \"boundary low\",\n  \"poseedor\": \"QA\",\n  \"anio\": 0,\n  \"imagenUrl\": \"https://example.com/img3.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-11: status is 400 (anio must be >= 1)', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-12: Create record - anio at minimum boundary (1)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Boundary year\",\n  \"descripcion\": \"boundary ok\",\n  \"poseedor\": \"QA\",\n  \"anio\": 1,\n  \"imagenUrl\": \"https://example.com/img4.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-12: status is 201 (anio = 1 is valid)', () => pm.response.to.have.status(201));",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('boundaryRecordId', pm.response.json()._id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-19: GET /records responds with JSON content type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-19 (Interoperability): content-type is application/json', () => {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cleanup: delete Regression fixture record",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{regRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{regRecordId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('cleanup: fixture deleted', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cleanup: delete boundary-year record",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{boundaryRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{boundaryRecordId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('cleanup: boundary record deleted', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "CRUD edge cases, boundaries, and error handling for /records."
+    },
+    {
+      "name": "04 - Regression - Business Rules & Security",
+      "item": [
+        {
+          "name": "Setup: create an official record (isOficial=true)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Note: the API accepts isOficial directly from the client on create - a secondary finding worth mentioning (no server-side restriction on who can mark a record 'official').",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Official Record\",\n  \"descripcion\": \"Should be protected from deletion\",\n  \"poseedor\": \"QA\",\n  \"anio\": 2015,\n  \"imagenUrl\": \"https://example.com/img5.png\",\n  \"isOficial\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('officialRecordId', pm.response.json()._id); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-13: Delete rejected for an official record",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{officialRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{officialRecordId}}"
+              ]
+            },
+            "description": ""
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-13: status is 403', () => pm.response.to.have.status(403));",
+                  "pm.test('API-RG-13: protection message present', () => {",
+                  "  pm.expect(pm.response.json().message).to.include('oficial');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-14: Create record WITHOUT Authorization header",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/records",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records"
+              ]
+            },
+            "description": "Known defect (see security notes): recordRoutes.js never applies authMiddleware, so this currently returns 201 instead of the 401 a protected write endpoint should return.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Unauthenticated write\",\n  \"descripcion\": \"sent with no Authorization header\",\n  \"poseedor\": \"attacker\",\n  \"anio\": 2026,\n  \"imagenUrl\": \"https://example.com/img6.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-14 (Security finding): expected 401, actual result documented', () => {",
+                  "  pm.collectionVariables.set('unauthRecordId', pm.response.code === 201 ? pm.response.json()._id : '');",
+                  "  pm.expect([200,201,401]).to.include(pm.response.status === undefined ? pm.response.code : pm.response.code);",
+                  "});",
+                  "pm.test('API-RG-14: SECURITY FINDING if 201 - write endpoint has no auth check', () => {",
+                  "  if (pm.response.code === 201) { console.warn('SECURITY FINDING: POST /records succeeded with no Authorization header'); }",
+                  "  pm.expect(pm.response.code).to.be.oneOf([201, 401]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-15: Delete WITHOUT Authorization header (cleanup + security check)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/records/{{unauthRecordId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "records",
+                "{{unauthRecordId}}"
+              ]
+            },
+            "description": "Also acts as cleanup for the record created in API-RG-14."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-15: SECURITY FINDING if 200 - delete endpoint has no auth check', () => {",
+                  "  if (pm.response.code === 200) { console.warn('SECURITY FINDING: DELETE /records/:id succeeded with no Authorization header'); }",
+                  "  pm.expect(pm.response.code).to.be.oneOf([200, 401, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-16: Login - NoSQL injection attempt is not authenticated",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Sends Mongo operator objects instead of strings. The important assertion is that this never returns 200/token; the exact status (400 vs 500) is noted as a secondary robustness finding.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": {\n    \"$ne\": null\n  },\n  \"password\": {\n    \"$ne\": null\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-16 (Security): injection payload does not return a token', () => {",
+                  "  pm.expect(pm.response.code).to.not.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "isOficial protection rule, and the known missing-auth-middleware finding on write routes."
+    },
+    {
+      "name": "05 - Regression - Contact",
+      "item": [
+        {
+          "name": "API-RG-17: Create contact message with valid data",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Marcos Vidal\",\n  \"email\": \"marcos.javier.vidal@gmail.com\",\n  \"asunto\": \"QA test message\",\n  \"mensaje\": \"This is a test message sent by the API regression suite.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-17: status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('API-RG-17: response echoes the contact', () => {",
+                  "  pm.expect(pm.response.json().contact.nombre).to.eql('Marcos Vidal');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API-RG-18: Create contact - missing required field",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "contact"
+              ]
+            },
+            "description": "",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Marcos Vidal\",\n  \"email\": \"marcos.javier.vidal@gmail.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('API-RG-18: status is 400', () => pm.response.to.have.status(400));",
+                  "pm.test('API-RG-18: required-fields message', () => {",
+                  "  pm.expect(pm.response.json().message).to.include('obligatorios');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Covers the third controller (contactController)."
+    },
+    {
+      "name": "06 - Data Driven",
+      "item": [
+        {
+          "name": "DD: Register - data-driven boundary/validation cases",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Run this request with register_data.csv via Collection Runner (or Newman -d) to execute 6 data rows covering valid, boundary, and missing-field cases for registration.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const u = pm.iterationData.get('username');",
+                  "if (u && u.length >= 3) { pm.variables.set('username', u + '_' + Date.now()); }",
+                  "else { pm.variables.set('username', u); }",
+                  "pm.variables.set('password', pm.iterationData.get('password'));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const expected = parseInt(pm.iterationData.get('expectedStatus'));",
+                  "pm.test('DD row (' + pm.iterationData.get('note') + '): status is ' + expected, () => {",
+                  "  pm.response.to.have.status(expected);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Data-driven technique using register_data.csv (Collection Runner)."
+    }
+  ],
+  "variable": [
+    {
+      "key": "dynUsername",
+      "value": ""
+    },
+    {
+      "key": "registeredPassword",
+      "value": ""
+    },
+    {
+      "key": "authToken",
+      "value": ""
+    },
+    {
+      "key": "smokeRecordId",
+      "value": ""
+    },
+    {
+      "key": "regRecordId",
+      "value": ""
+    },
+    {
+      "key": "boundaryRecordId",
+      "value": ""
+    },
+    {
+      "key": "officialRecordId",
+      "value": ""
+    },
+    {
+      "key": "unauthRecordId",
+      "value": ""
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "_id": "6650a9999999999999999999",
+  "titulo": "Récord creado por Cypress",
+  "descripcion": "Registro de prueba generado por la suite UI automatizada.",
+  "poseedor": "QA Automation",
+  "anio": 2026,
+  "imagenUrl": "https://placehold.co/400x220?text=Nuevo",
+  "isOficial": false
+}

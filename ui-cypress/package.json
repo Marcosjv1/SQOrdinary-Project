@@ -1,0 +1,16 @@
+{
+  "name": "guinnesswr-ui-cypress",
+  "version": "1.0.0",
+  "description": "Cypress E2E/UI test suite for the GuinnessWR frontend (SQ Ordinary Project)",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "test": "cypress run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^13.17.0"
+  }
+}
