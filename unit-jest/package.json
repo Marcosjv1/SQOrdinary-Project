@@ -1,14 +1,14 @@
 {
-  "name": "budget-tracker-sut",
+  "name": "guinnesswr-unit-tests",
   "version": "1.0.0",
-  "description": "Budget Tracker SUT for the Software Quality ordinary project",
-  "main": "src/server.js",
+  "description": "Unit tests (Jest) for the GuinnessWR backend business logic",
   "scripts": {
-    "start": "node src/server.js",
-    "test": "jest"
+    "test": "jest --coverage"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "bcrypt": "^5.1.0",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^9.4.1"
   },
   "devDependencies": {
     "jest": "^29.7.0"

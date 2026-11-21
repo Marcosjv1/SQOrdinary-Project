@@ -1,61 +1,67 @@
-# Budget Tracker — Software Quality Ordinary Project
+# GuinnessWR — Software Quality Ordinary Project
 
 **Course:** Software Quality Engineering, Period 202660
 **Team:** Matias Angelico Montoto, Marcos Vidal Cerna
 
 ## SUT description
 
-Budget Tracker is a small web app to manage a monthly personal budget. You create
-spending categories with a monthly limit, log expenses against those categories,
-and see a running total of how much you have spent and how much is left, both per
-category and overall for a given month.
+GuinnessWR is a full-stack web app to register, browse and manage extraordinary
+records (think Guinness World Records). Visitors can browse a public gallery of
+records; registered users can log in, create new records, edit existing ones and
+delete records that are not marked official. The SUT was built in a previous
+course (Programación para Internet) and is reused here as allowed by the project
+guidelines.
 
-## Tech stack
-
-- Backend: Node.js + Express
-- Frontend: plain HTML, CSS and JavaScript (no framework)
-- Storage: local JSON file (`unit-jest/src/data.json`), no external database
+- Frontend: React + Vite + Bootstrap 5, deployed on Netlify — https://guinnesswr.netlify.app
+- Backend: Node.js + Express 5 + Mongoose, deployed on Render — https://backendguinnesswr.onrender.com
+- Database: MongoDB Atlas
 
 ## How to run it
 
+Backend:
 ```bash
-cd unit-jest
+cd backend
 npm install
 npm start
 ```
 
-The app runs at `http://localhost:3000`.
+Frontend:
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Or just use the deployed URLs above — both are live.
 
 ## API endpoints
 
 | Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/categories` | Create a category |
-| GET | `/api/categories` | List categories (with spent/remaining/overBudget) |
-| GET | `/api/categories/:id` | Get one category |
-| PUT | `/api/categories/:id` | Update a category |
-| DELETE | `/api/categories/:id` | Delete a category |
-| POST | `/api/expenses` | Create an expense |
-| GET | `/api/expenses` | List expenses (optional `?category=` and `?from=&to=`) |
-| GET | `/api/expenses/:id` | Get one expense |
-| PUT | `/api/expenses/:id` | Update an expense |
-| DELETE | `/api/expenses/:id` | Delete an expense |
-| GET | `/api/summary` | Overall summary (optional `?month=YYYY-MM`) |
+| POST | `/api/auth/register` | Create a user account |
+| POST | `/api/auth/login` | Log in, returns a JWT |
+| GET | `/api/records` | List all records |
+| GET | `/api/records/:id` | Get one record |
+| POST | `/api/records` | Create a record |
+| PUT | `/api/records/:id` | Update a record |
+| DELETE | `/api/records/:id` | Delete a record (rejected if `isOficial`) |
+| POST | `/api/contact` | Submit a contact message |
+| GET | `/api/contact` | List contact messages |
 
 ## How to run the tests
 
-- **Jest (unit):** `cd unit-jest && npx jest --coverage` — *pending, test plans not written yet*
+- **Jest (unit):** `cd unit-jest && npm install && npm test` — 22 tests (5 smoke, 17 regression), ~83% statement coverage on controllers
 - **Postman/Newman (API):** *pending*
 - **Cypress (UI):** *pending*
 
 ## Project structure
 
 ```
-budget-tracker/
-├── unit-jest/        # SUT source code + Jest unit tests
-├── api-postman/       # Postman collection, environment, CSV data
-├── ui-cypress/        # Cypress project (specs + page objects)
-├── docs/              # project document, test plans, presentation
-├── exploratory/       # test charters, session notes, bug reports
-└── evidence/          # screenshots of passing test runs
+GuinnessWR-ordinario/
+├── unit-jest/          # Snapshot of the tested SUT modules + Jest unit tests
+├── api-postman/        # Postman collection, environment, CSV data
+├── ui-cypress/         # Cypress project (specs + page objects)
+├── docs/               # project document, test plans, presentation
+├── exploratory/        # test charters, session notes, bug reports
+└── evidence/           # screenshots of passing test runs
 ```
