@@ -1,0 +1,16 @@
+{
+  "name": "budget-tracker-sut",
+  "version": "1.0.0",
+  "description": "Budget Tracker SUT for the Software Quality ordinary project",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
