@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Budget Tracker</h1>
+</header>
+
+<section id="summary" data-test="summary-section">
+  <h2>Monthly Summary</h2>
+  <label for="summary-month">Month</label>
+  <input type="month" id="summary-month" data-test="summary-month-input">
+  <div data-test="summary-total-budget">Total budget: $<span id="summary-total-budget">0</span></div>
+  <div data-test="summary-total-spent">Total spent: $<span id="summary-total-spent">0</span></div>
+  <div data-test="summary-total-remaining">Total remaining: $<span id="summary-total-remaining">0</span></div>
+  <div class="progress-bar" data-test="summary-progress-bar">
+    <div class="progress-fill" id="summary-progress-fill"></div>
+  </div>
+</section>
+
+<section id="categories" data-test="categories-section">
+  <h2>Categories</h2>
+  <form id="category-form" data-test="category-form">
+    <input type="text" id="category-name" placeholder="Category name" data-test="category-name-input" required>
+    <input type="number" id="category-limit" placeholder="Monthly limit" data-test="category-limit-input" required>
+    <button type="submit" data-test="category-submit-btn">Add category</button>
+  </form>
+  <ul id="category-list" data-test="category-list"></ul>
+</section>
+
+<section id="expenses" data-test="expenses-section">
+  <h2>Expenses</h2>
+  <form id="expense-form" data-test="expense-form">
+    <select id="expense-category" data-test="expense-category-select" required></select>
+    <input type="number" id="expense-amount" placeholder="Amount" data-test="expense-amount-input" required>
+    <input type="text" id="expense-description" placeholder="Description" data-test="expense-description-input" required>
+    <input type="date" id="expense-date" data-test="expense-date-input" required>
+    <button type="submit" data-test="expense-submit-btn">Add expense</button>
+  </form>
+  <ul id="expense-list" data-test="expense-list"></ul>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
